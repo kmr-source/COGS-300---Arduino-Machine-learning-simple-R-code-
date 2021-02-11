@@ -1,0 +1,169 @@
+#define LMotor_In 6 //right input
+#define LMotor_Out 5 //right output
+#define RMotor_In 10 //left input
+#define RMotor_Out 9 //left output
+#include <NewPing.h>
+
+int left_sen = A0;    //A = left
+int center_sen = A1;  //B = center
+int right_sen = A2;   //C = right
+int ValSens_A = 0;
+int ValSens_B = 0;
+int ValSens_C = 0;
+
+//FRONT SENSOR
+#define TRIGGER_FRONT 3
+#define ECHO_FRONT 4
+
+//LEFT SENSOR
+#define TRIGGER_LEFT 12
+#define ECHO_LEFT 13
+#define MAX_DISTANCE 500
+
+// our sensors 
+NewPing leftsonar(TRIGGER_LEFT, ECHO_LEFT, MAX_DISTANCE);
+ 
+#define LEFTTHRESHOLD 20
+#define FRONTTHRESHOLD 20
+
+#define centerThres 200
+#define leftThres 300
+#define rightThres 300
+
+
+//    int photocellPin = 0; // the cell and 10K pulldown are connected to a0
+//    int photocellReading; // the analog reading from the sensor divider
+//    int LEDpin = 11; // connect Red LED to pin 11 (PWM pin) (this is not needed to use the sensor but if you have one laying around it could add a cool affect! This can be bought at your local Radio Shack.)
+//    int LEDbrightness; //
+ 
+
+//    void loop(void) {
+//    photocellReading = analogRead(photocellPin);
+//    Serial.print("Analog reading = ");
+//    Serial.println(photocellReading); // the raw analog reading
+//    // LED gets brighter the darker it is at the sensor
+//    // that means we have to -invert- the reading from 0-1023 back to 1023-0
+//    photocellReading = 1023 - photocellReading;    //now we have to map 0-1023 to 0-255 since thats the          range analogWrite uses
+//    LEDbrightness = map(photocellReading, 0, 1023, 0, 255);
+//    analogWrite(LEDpin, LEDbrightness);
+//    delay(100);        
+//    }
+
+void setup() {
+  Serial.begin(9600);
+}
+
+void loop(){
+  //forward();
+  //delay(1000);
+
+//   stop();
+//   delay(1000);
+
+//   backward();
+//   delay(1000);
+
+//   stop();
+//   delay(2000);
+
+//   right();
+//   delay(3000);
+
+//   stop();
+//   delay(2000);
+
+//   left();
+//   delay(3000);
+  
+  unsigned int leftDistance = leftsonar.ping_cm();
+  unsigned int frontDistance = frontsonar.ping_cm();
+  Serial.print("left: ");
+  Serial.print(leftDistance);
+  Serial.println("cm");
+  Serial.print("front: ");
+  Serial.print(frontDistance);
+  Serial.println("cm");
+  //delay(200);
+  
+ if(leftDistance > 20){
+  stop();
+  forward();
+  //delay(200);
+  left();
+} else if(frontDistance > 20 ){
+ forward();
+} else {
+  stop();
+  right();
+}
+  
+}
+
+void forward() {                                  //forward
+  Serial.println("forward");
+//LEFT MOTOR
+  analogWrite(LMotor_In, 210);
+  analogWrite(LMotor_Out, 0);
+
+//RIGHT MOTOR
+  analogWrite(RMotor_In, 200);
+  analogWrite(RMotor_Out, 0);   
+}
+
+void backward() {                                 //backward
+  Serial.println("backward");
+//LEFT MOTOR
+  analogWrite(LMotor_In, 0);
+  analogWrite(LMotor_Out, 200);
+
+//RIGHT MOTOR
+  analogWrite(RMotor_In, 0);
+  analogWrite(RMotor_Out, 200);   
+}
+
+void left() {                                     //left
+  Serial.println("left");
+//LEFT MOTOR
+  analogWrite(LMotor_In, 0);
+  analogWrite(LMotor_Out, 0);
+
+//RIGHT MOTOR
+  analogWrite(RMotor_In, 150);
+  analogWrite(RMotor_Out, 0);   
+}
+
+void right() {                                     //right
+  Serial.println("right");
+//LEFT MOTOR
+  analogWrite(LMotor_In, 150);
+  analogWrite(LMotor_Out, 0);
+
+//RIGHT MOTOR
+  analogWrite(RMotor_In, 0);
+  analogWrite(RMotor_Out, 150);   
+}
+
+void stop() {
+  //stop
+  Serial.println("stop");
+//LEFT MOTOR
+  analogWrite(LMotor_In, 0);
+  analogWrite(LMotor_Out, 0);
+
+//RIGHT MOTOR
+  analogWrite(RMotor_In, 0);
+  analogWrite(RMotor_Out, 0);
+  delay(50);
+}
+
+	1.	How does the algorithm our robot uses guarantee that it will make it through any maze which does not contain circles?
+
+		If there was a circle wall in the maze and the robot left sensor was against the circle wall, the front sensor will sense that there is still enough space to move forward. This is a problem because the front sensor will always be moving forward since it is using the left sensor as a guiding sensor for distance, so it will continue moving in an infinite loop. The robot will be guarantee to make it though any maze without a circle because of it’s layered levels of behavior, which makes us able to code our algorithm in a way where the robot will move through the maze by using its left sensor to sense it’s distance from it’s left wall, move forward by using the front sensor to sense the distance. If the distance from the left distance from the wall is less than 20cm It will move forward, stop then turn left, and if the front distance is greater than 20 it’ll move forward, otherwise it’ll stop and turn right. This is our layered behavior.
+
+	1.	2. Compare your bot to the example of the omelette making robot (slide 3) we discussed near the beginning of term. How does it differ? Which one do you think is a better model of cognition and why?
+
+		The omelette making robot on the right side has a code that is more autonomous. The code on the left side for the omelette robot precise actions that is similar to that of humans. The one on the left side is a better model of cognition because it demonstrate the process of perception, then cognition through symbol recognition, like the salt, eggs, milk, pepper etc. Then the thinking process of checking how much parsley is needed, if its less then a certain amount like two we chop it. This is like our thinking process where we think, before we complete the action. On the other hand the right side of the code is using the subsumption architecture which may seem to demonstrate cognition but isn’t really doing the “thinking” or cognition process, but instead demonstrate intellectual behavior, more so than the left side of the code. 
+
+ 
+
+

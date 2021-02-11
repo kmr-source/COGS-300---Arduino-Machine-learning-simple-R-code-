@@ -1,0 +1,144 @@
+
+PART 2 Pseudo code 
+/*
+  PROGRAM TO DECIPHER MORSE CODE USING A PUSH BUTTON AND DISPLAY IT ON THE SERIAL MONITOR
+  DATE: 20 JANUARY 2017
+  AUTHORS: PINAKI SADHUKHAN AND PRIYANKA SADHUKHAN
+*/
+
+unsigned long signal_len,t1,t2;   //time for which button is pressed
+int inputPin = 2;                 //input pin for push button
+int ledPin = 4;                   //output pin for LED
+
+String code = "";                 //string in which one alphabet is stored
+
+void setup() {
+  Serial.begin(9600);
+  pinMode(inputPin, INPUT_PULLUP); //internal pullup resistor is used to simplify the circuit
+  pinMode(ledPin,OUTPUT);
+}
+
+void loop()
+{
+NextDotDash:
+  while (digitalRead(inputPin) == HIGH) {}
+  t1 = millis();                            //time at button press
+  digitalWrite(ledPin, HIGH);               //LED on while button pressed
+  while (digitalRead(inputPin) == LOW) {}
+  t2 = millis();                            //time at button release
+  digitalWrite(ledPin, LOW);                //LED off on button release
+  signal_len = t2 - t1;                     //time for which button is pressed
+  if (signal_len > 50)                      //to account for switch debouncing
+  {
+    code += readio();                       //function to read dot or dash
+  }
+  while ((millis() - t2) < 500)           //if time between button press greater than 0.5sec, skip loop and go to next alphabet
+  {     
+    if (digitalRead(inputPin) == LOW)
+    {
+      goto NextDotDash;
+    }
+  }
+  convertor();                          //function to decipher code into alphabet
+}
+
+char readio()
+{
+  if (signal_len < 600 && signal_len > 50)
+  {
+    return '.';                        //if button press less than 0.6sec, it is a dot
+  }
+  else if (signal_len > 1000)		
+  {
+    return '-';                        //if button press more than 1.0sec, it is a dash
+  }
+}
+
+void convertor()
+{
+ static String letters[] = {".-", "-...", "-.-.", "-..", ".", "..-.", "--.", "....", "..", ".---", "-.-", ".-..", "--", "-.", "---", ".--.", "--.-",
+                              ".-.", "...", "-", "..-", "...-", ".--", "-..-", "-.--", "--..","E"
+                            };
+                            
+  static String symbols[] = {"....","....-","....--","....---"};
+ 
+  // 1 stop 1 = 11 
+  int i = 0;
+  int first = 0;
+  int second = 0;
+  if (code == ".-.-.-")
+  {
+    Serial.print("Reset");   	// prints out reset 
+    first = 0;			// reset second number to 0
+    second = 0; //for Reset. 	// reset first number to 0
+  }
+  first = int(0+i);
+  second = int(0+i);
+  
+  
+  while (letters[i] != "E") 
+  {
+    if (code == "....") { // if symbol system matches, add 
+        // "ADD"
+      Serial.print(first);  	// print first number
+      Serial.println("+");  	// print add
+      Serial.println(second); 	// print second number and the equal sign then prints displays answer
+      Serial.println("=");
+      Serial.print(first+second);
+
+    }
+    if (symbols[i] == "....-") { // if symbol array matches, subtract
+      //subtract, prints first number subtracts second number = display calculation result
+      Serial.print(first);     
+      Serial.println("-");
+      Serial.print(second);
+      Serial.println("=");
+      Serial.print(first-second);
+      //symbol[0] = numbers[i];
+    }
+    if (symbols[i] == "....--") { // if symbols array matches, multiply 
+      // multiply: prints first number multiples second number, equal sign, then the answer
+      Serial.print(first);   
+      Serial.println("x");
+      Serial.print(second);
+      Serial.println("=");
+      Serial.print("multiply");
+      //symbol[0] = numbers[i];
+    }
+    if (symbols[i] == "....---") {. // symbol dictionary matches, divide 
+       // divide : prints first number / second number = answer 
+      Serial.print(first);
+      Serial.println("/");
+      Serial.print(second);
+      Serial.println("=");
+      Serial.print("divide");
+      //symbol[0] = numbers[i];
+    }
+    i++;
+  }
+    
+  if (letters[i] == "E")
+    {
+      Serial.println("<Wrong input>");  //if input code doesn't match any letter, error
+    }    
+  code = "";                            //reset code to blank string
+}
+
+
+
+1.) What is Physical Symbol System? Is this an example of one? Why?
+
+Physical symbol systems (PSS) takes symbols and combines them into new expression through manipulating them to make new expressions. In cognitive science it is hypothesized that a physical symbol system is able to demonstrate intelligent behaviour similar in scope as humans. So the physical symbol system theoretically should have sufficient means to display general intelligent action. Yes, the morse code decoder is an example of a physical symbol system because it takes in the code given, outputs it then manipulates it into a new expression. The action giving inputs and dots and dashes then converting it to letters and then to words is exactly what PSS does. 
+
+2.) Does this system display general intelligent behaviour? Can you give an example of a system that displays general intelligent behaviour?
+
+The action of taking in dots and dashes through the input button then translating it into alphabets is similar to how humans take in letters from the outside environment then store it in our brain, then output it through words spoken from our mouth. The morse code system in this lab displays the exact same procedures of first taking in input through the button, then the system translates it using a dictionary (array in the lab) into letters then outputs it onto the script as words. These actions are similar to how humans think, so I would argue that the system does display general intelligent behavior. Similar in part 2, where I made the morse code compute calculations, the actions of changing the dots and dashes to numbers by refererring to the dictionary, then outputting and computing the calculation is similar to how humans think. 
+
+What was difficult about this lab?
+
+The most difficult part of this lab was when we had to modify and create a pseudo code. It was difficult to get the program to execute the multiplication, addition, subtraction and division. Therefore, I would say the hardest part was altering the code. 
+
+
+What was easy about this lab?
+
+Part 1 was the easiest since the code was already given to us, and all we had to do was follow the instructions and enter the code into the Arduino application. 
